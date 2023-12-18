@@ -206,3 +206,13 @@ function spawnTiles()
 
     GRID[emptySpaces[randomNum][1]][emptySpaces[randomNum][2]] = randomTile
 end
+
+function getSum()
+    sum = 0
+    for row = 1, 4 do
+        for col = 1, 4 do
+            sum = sum + GRID[row][col]
+        end
+    end
+    return sum
+end
