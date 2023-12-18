@@ -1,11 +1,25 @@
 
-
+logic = require("logic")
 
 
 function love.keypressed(key)
     if(key == "escape") then
         love.event.quit()
     end
+    if(key == "w") then
+        up()
+    elseif (key == "d") then
+        right()
+    elseif (key == "a") then
+        left()
+    elseif (key == "s") then
+        down()
+    elseif(key == "b") then
+        spawnTiles()
+    else
+        print("Invalid input")
+    end
+    spawnTiles()
 end
 
 function love.load()
@@ -19,19 +33,25 @@ function love.load()
     COL_3 = WIDTH/4 + 200
     COL_4 = WIDTH/4 + 300
 
+    COLUMNS = {COL_1, COL_2, COL_3, COL_4}
+
     ROW_1 = HEIGHT/4
     ROW_2 = HEIGHT/2 - 50
     ROW_3 = HEIGHT/2 + 50
     ROW_4 = HEIGHT/2 + 150
 
+    ROWS = {ROW_1, ROW_2, ROW_3, ROW_4}
+
     TILE_DIMENSIONS = 100 -- 100x100
 
 
     -- LOAD THE GRID
-    gridRow_1 = {1, 0, 0, 0}
-    gridRow_2 = {0, 0, 0, 0}
-    gridRow_3 = {0, 0, 0, 0}
-    gridRow_4= {0, 0, 0, 0}
+    gridRow_1 = {2, 0, 0, 0}
+    gridRow_2 = {0, 4, 0, 0}
+    gridRow_3 = {0, 0, 0, 2}
+    gridRow_4= {0, 2, 0, 0}
+
+    GRID = {gridRow_1, gridRow_2, gridRow_3, gridRow_4}
 
     -- lOAD THE CARDS
     tiles = {}
@@ -44,14 +64,13 @@ function love.load()
 end
 
 function love.draw()
-    love.graphics.draw(tiles["2"], COL_1, ROW_1)
-    love.graphics.draw(tiles["4"], COL_2, ROW_1)
-    love.graphics.draw(tiles["4"], COL_3, ROW_1)
-    love.graphics.draw(tiles["4"], COL_4, ROW_1)
-
-    love.graphics.draw(tiles["8"], COL_1, ROW_2)
-    love.graphics.draw(tiles["8"], COL_1, ROW_3)
-    love.graphics.draw(tiles["8"], COL_1, ROW_4)
+    for row = 1 , 4 do
+        for col = 1 , 4 do
+            if GRID[row][col] ~= 0 then
+                love.graphics.draw(tiles[tostring(GRID[row][col])], COLUMNS[col], ROWS[row])
+            end
+        end
+    end
 end
 
 function love.update(dt)
