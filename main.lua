@@ -2,7 +2,7 @@
 logic = require("logic")
 
 
-function love.keypressed(key)
+function love.keypressed(key, dt)
     if(key == "escape") then
         love.event.quit()
     end
@@ -22,7 +22,13 @@ function love.keypressed(key)
     spawnTiles()
 end
 
+
 function love.load()
+    -- SET THE NAME AND ICON
+    love.window.setTitle("2048")
+    icon = love.image.newImageData("Tiles/2048.png")
+    love.window.setIcon(icon)
+
     -- WIDTH AND HEIGHT OF THE WINDOW
     WIDTH = love.graphics.getWidth()
     HEIGHT = love.graphics.getHeight()
@@ -55,6 +61,14 @@ function love.load()
 
     -- lOAD THE CARDS
     tiles = {}
+    font = love.graphics.newFont(20)
+
+    -- PLAY SOME MUSIC
+    music = love.audio.newSource("Music/crazySong.mp3", "stream")
+    music:setVolume(0.2)
+    music:setLooping(true)
+    love.audio.play(music)
+    musicBTN = {x = 40, y = 300, w = 5, h = 5}
 
     i = 2
     while i < 8193 do
@@ -63,7 +77,37 @@ function love.load()
     end
 end
 
+local isDragging = false
+local offsetX, offsetY
+
+function love.update(dt)
+    local mouseX, mouseY = love.mouse.getPosition()
+
+    if love.mouse.isDown(1) then -- 1 represents the left mouse button
+        if isPointInCircle(mouseX, mouseY, musicBTN.x, musicBTN.y, musicBTN.w) then
+            isDragging = true
+            offsetX = mouseX - musicBTN.x
+            offsetY = mouseY - musicBTN.y
+        end
+    else
+        isDragging = false
+    end
+
+    if isDragging then
+        musicBTN.y =  math.min(math.max(mouseY - offsetY, 250), 350)
+        local normalizedValue = 1 - (musicBTN.y - 250) / (350 - 250)
+        music:setVolume(normalizedValue)
+    end
+end
+
+function isPointInCircle(px, py, cx, cy, radius)
+    local distanceSquared = (px - cx)^2 + (py - cy)^2
+    return distanceSquared <= radius^2
+end
+
 function love.draw()
+    love.graphics.setFont(font)
+    love.graphics.print("Score: " ..getSum(), 40, 40)
     for row = 1 , 4 do
         for col = 1 , 4 do
             if GRID[row][col] ~= 0 then
@@ -71,8 +115,6 @@ function love.draw()
             end
         end
     end
-end
-
-function love.update(dt)
-    
+    love.graphics.line(40, 250, 40, 350)
+    love.graphics.circle("fill", musicBTN.x, musicBTN.y, musicBTN.w)
 end
